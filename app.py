@@ -14,11 +14,11 @@ st.markdown("""
     }
     
     .title {
-        font-size: 60px;
-        font-weight: bold;
-        text-align: center;
-        color: white;
-        margin-bottom: 20px;
+        font-size: 60px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        color: white !important;
+        margin-bottom: 20px !important;
     }
     
     .subtitle {
