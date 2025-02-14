@@ -69,5 +69,3 @@ with col2:
         st.switch_page("pages/visualization_4.py")
     if st.button("🏆 수상"):
         st.switch_page("pages/visualization_5.py")
-    if st.button("💳 핀테크"):
-        st.switch_page("pages/visualization_6.py")
