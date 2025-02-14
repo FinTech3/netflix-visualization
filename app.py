@@ -6,37 +6,75 @@ st.set_page_config(page_title="Netflix Is All You Need", layout="wide")
 # 스타일 적용
 st.markdown("""
     <style>
-        .title {
-            font-size: 48px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .subtitle {
-            font-size: 20px;
-            text-align: center;
-            color: grey;
-        }
-        .container {
-            background-color: black;
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-        }
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .button {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-        }
+    .stApp {
+        background-image: url("https://github.com/user-attachments/assets/585ecfa1-c4fd-4d92-a451-cac484a05c78");
+        background-size: cover;
+        background-attachment: fixed;
+        color: white;
+    }
+    
+    .title {
+        font-size: 48px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+    }
+    
+    .subtitle {
+        font-size: 20px;
+        text-align: center;
+        color: white;
+    }
+
+    .container {
+        background-color: #8A0829;
+        padding: 15px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        width: 40%;
+        margin: auto;
+    }
+
+    .container h2, .container p {
+        color: white;
+    }
+
+    .button-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    /* 기본 버튼 스타일 */
+    .button {
+        width: 30%;
+        padding: 15px;
+        font-size: 18px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: #8A0829; 
+        color: white !important; /* 글자 색상을 흰색으로 강제 */
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: bold;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* 버튼 호버 효과 */
+    .button:hover {
+        background: #F7819F; /* 호버 시 더 밝은 색 */
+        color: white !important;
+    }
+
+    /* 버튼 컨테이너 */
+    .button-container {
+        text-align: center;
+        margin: 10px 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -48,25 +86,17 @@ st.markdown('<p class="subtitle">Explore the world through data</p>', unsafe_all
 with st.container():
     st.markdown('<div class="container"><h2>Discover Your Travel Personality</h2>'
                 '<p>Take our MVTI test and uncover your ideal travel experiences.</p>'
-                '<a href="/pages/mvti_test" class="button" style="background:white; color:black; padding:10px; border-radius:5px; text-decoration:none;">Start MVTI Test →</a>'
+                '<a href="/pages/mvti_test" class="button">Start MVTI Test →</a>'
                 '</div>', unsafe_allow_html=True)
 
-# 버튼 레이아웃
+# 버튼 레이아웃 (HTML 버튼 활용)
 col1, col2 = st.columns(2)
 
-# 첫 번째 컬럼 버튼
 with col1:
-    if st.button("📈 주가"):
-        st.switch_page("pages/visualization_1.py")
-    if st.button("🌎 국가"):
-        st.switch_page("pages/visualization_2.py")
-    if st.button("▶️ OTT"):
-        st.switch_page("pages/visualization_3.py")
+    st.markdown('<div class="button-container"><a href="/pages/visualization_1.py" class="button">📈 주가</a></div>', unsafe_allow_html=True)
+    st.markdown('<div class="button-container"><a href="/pages/visualization_2.py" class="button">🌎 국가</a></div>', unsafe_allow_html=True)
+    st.markdown('<div class="button-container"><a href="/pages/visualization_3.py" class="button">▶️ OTT</a></div>', unsafe_allow_html=True)
 
-# 두 번째 컬럼 버튼
 with col2:
-    if st.button("🏷️ 태그"):
-        st.switch_page("pages/visualization_4.py")
-    if st.button("🏆 수상"):
-        st.switch_page("pages/visualization_5.py")
-
+    st.markdown('<div class="button-container"><a href="/pages/visualization_4.py" class="button">🏷️ 태그</a></div>', unsafe_allow_html=True)
+    st.markdown('<div class="button-container"><a href="/pages/visualization_5.py" class="button">🏆 수상</a></div>', unsafe_allow_html=True)
