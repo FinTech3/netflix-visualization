@@ -14,66 +14,84 @@ st.markdown("""
     }
     
     .title {
-        font-size: 48px;
+        font-size: 60px;
         font-weight: bold;
         text-align: center;
         color: white;
+        margin-bottom: 20px;
     }
     
     .subtitle {
-        font-size: 20px;
+        font-size: 24px;
         text-align: center;
         color: white;
+        margin-bottom: 40px;
     }
 
     .container {
-        background-color: #8A0829;
-        padding: 15px;
-        border-radius: 10px;
+        background-color: rgba(138, 8, 41, 0.8);
+        padding: 30px;
+        border-radius: 15px;
         color: white;
         text-align: center;
-        width: 40%;
-        margin: auto;
+        width: 60%;
+        margin: 0 auto 40px auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .container h2, .container p {
+    .container h2 {
         color: white;
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+
+    .container p {
+        color: white;
+        font-size: 18px;
+        margin-bottom: 20px;
     }
 
     .button-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
         margin-top: 20px;
     }
 
-    /* 기본 버튼 스타일 */
     .button {
-        width: 30%;
+        width: calc(33% - 20px);
         padding: 15px;
         font-size: 18px;
         border-radius: 10px;
         border: none;
         cursor: pointer;
-        background: #8A0829; 
-        color: white !important; /* 글자 색상을 흰색으로 강제 */
+        background: rgba(138, 8, 41, 0.8);
+        color: white !important;
         text-align: center;
         text-decoration: none;
         display: inline-block;
         font-weight: bold;
-        transition: background 0.3s ease, color 0.3s ease;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* 버튼 호버 효과 */
     .button:hover {
-        background: #F7819F; /* 호버 시 더 밝은 색 */
-        color: white !important;
+        background: #F7819F;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* 버튼 컨테이너 */
-    .button-container {
-        text-align: center;
-        margin: 10px 0;
+    .mvti-button {
+        background: #F7819F;
+        color: white !important;
+        padding: 15px 30px;
+        font-size: 20px;
+        margin-top: 20px;
+    }
+
+    .mvti-button:hover {
+        background: #8A0829;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -86,17 +104,14 @@ st.markdown('<p class="subtitle">Explore the world through data</p>', unsafe_all
 with st.container():
     st.markdown('<div class="container"><h2>Discover Your Travel Personality</h2>'
                 '<p>Take our MVTI test and uncover your ideal travel experiences.</p>'
-                '<a href="/pages/mvti_test" class="button">Start MVTI Test →</a>'
+                '<a href="/pages/mvti_test" class="button mvti-button">Start MVTI Test →</a>'
                 '</div>', unsafe_allow_html=True)
 
-# 버튼 레이아웃 (HTML 버튼 활용)
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown('<div class="button-container"><a href="/pages/visualization_1.py" class="button">📈 주가</a></div>', unsafe_allow_html=True)
-    st.markdown('<div class="button-container"><a href="/pages/visualization_2.py" class="button">🌎 국가</a></div>', unsafe_allow_html=True)
-    st.markdown('<div class="button-container"><a href="/pages/visualization_3.py" class="button">▶️ OTT</a></div>', unsafe_allow_html=True)
-
-with col2:
-    st.markdown('<div class="button-container"><a href="/pages/visualization_4.py" class="button">🏷️ 태그</a></div>', unsafe_allow_html=True)
-    st.markdown('<div class="button-container"><a href="/pages/visualization_5.py" class="button">🏆 수상</a></div>', unsafe_allow_html=True)
+# 버튼 그리드 레이아웃
+st.markdown('<div class="button-grid">'
+            '<a href="/pages/visualization_1.py" class="button">📈 주가</a>'
+            '<a href="/pages/visualization_2.py" class="button">🌎 국가</a>'
+            '<a href="/pages/visualization_3.py" class="button">▶️ OTT</a>'
+            '<a href="/pages/visualization_4.py" class="button">🏷️ 태그</a>'
+            '<a href="/pages/visualization_5.py" class="button">🏆 수상</a>'
+            '</div>', unsafe_allow_html=True)
