@@ -75,6 +75,5 @@ fig.update_xaxes(
 
 st.plotly_chart(fig, use_container_width=True)
 
-
 st.title("📈 주가 분석 (추가)")
 st.write("이 페이지에서는 최종 전처리된 CSV('2-1_total.csv')를 직접 불러와 시각화합니다.")
