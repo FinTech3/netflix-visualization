@@ -53,7 +53,11 @@ min_c = df['Close'].min()
 max_c = df['Close'].max()
 fig.update_yaxes(
     title_text="Stock Price (USD)",
+<<<<<<< HEAD
     range=[min_c-100, max_c+100],
+=======
+    range=[min_c-50, max_c+50],
+>>>>>>> 59abbdcc2c2a246400b034b0ebad0960c363ff4b
     secondary_y=False
 )
 fig.update_yaxes(
