@@ -4,6 +4,7 @@ import folium
 import country_converter as coco  # 국가 이름을 코드로 변환
 from streamlit_folium import st_folium
 import os
+import numpy as np
 
 # 📌 Streamlit UI
 st.title("Netflix 주간별 Top 1 Visualization")
@@ -46,7 +47,7 @@ def get_country_coords():
     return pd.DataFrame({"country_iso2": iso_codes, "latitude": latitudes, "longitude": longitudes})
 
 
-# 데이터 캐싱
+# 데이터 로드 (캐싱)
 @st.cache_data
 def load_data():
     base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
@@ -55,12 +56,11 @@ def load_data():
         pd.read_csv(os.path.join(base_path, "2-2_tv.csv")),
     )
 
-
 # 🏆 1위 작품만 필터링
 movies_df, series_df = load_data()
-movies_top1 = movies_df[movies_df["weekly_rank"] == 1]
-series_top1 = series_df[series_df["weekly_rank"] == 1]
-top1_df = pd.concat([movies_top1, series_top1], ignore_index=True)
+movies_df["content_type"] = "Movie"  # 영화
+series_df["content_type"] = "TV"  # TV
+top1_df = pd.concat([movies_df[movies_df["weekly_rank"] == 1], series_df[series_df["weekly_rank"] == 1]], ignore_index=True)
 
 # 국가 데이터 병합
 country_coords = get_country_coords()
@@ -69,34 +69,63 @@ top1_df = top1_df.merge(country_coords, on="country_iso2", how="left")
 # 📅 주간 목록
 weeks = sorted(top1_df["week"].unique(), reverse=True)
 
-# 📌 주간 선택 (Streamlit UI 추가)
+# 📌 주간 선택
 selected_week = st.selectbox("주간을 선택하세요:", weeks)
+
+# 📌 콘텐츠 유형 선택 (영화/TV)
+content_options = ["Movie", "TV"]
+selected_content = st.radio("콘텐츠 유형을 선택하세요:", content_options, horizontal=True)
 
 # 🏆 주간별 데이터 필터링 (캐싱)
 @st.cache_data
-def filter_week_data(week):
-    week_df = top1_df[top1_df["week"] == week]
+def filter_week_data(week, content_type):
+    week_df = top1_df[(top1_df["week"] == week) & (top1_df["content_type"] == content_type)].copy()
+    
+    # ✅ 각 작품이 몇 개의 서로 다른 국가에서 1위를 했는지 계산
     weekly_counts = week_df.groupby("show_title")["country_iso2"].nunique()
-    week_df["category"] = week_df["show_title"].map(lambda x: "Global Hit" if weekly_counts[x] > 1 else "National Hit")
+    
+    # ✅ 글로벌 히트 수정: 2개 이상의 서로 다른 국가에서 1위를 해야 글로벌 히트
+    week_df["category"] = week_df["show_title"].map(lambda x: "Global Hit" if weekly_counts[x] >= 2 else "National Hit")
+    
+    # ✅ 글로벌 히트 작품의 국가 개수를 저장 (각 작품이 몇 개 나라에서 1위를 했는지)
+    week_df["global_hit_count"] = week_df["show_title"].map(lambda x: weekly_counts[x] if weekly_counts[x] >= 2 else 1)
+    
     return week_df
 
-week_df = filter_week_data(selected_week)
+week_df = filter_week_data(selected_week, selected_content)
 
-# 🌍 국가별 작품 수 계산
-country_counts_df = week_df.groupby(["country_iso2", "category"]).size().reset_index(name="count")
+# 🌍 국가별 1위를 한 작품의 국가 수 계산
+country_hit_counts = week_df.groupby(["country_iso2", "category"])["global_hit_count"].sum().reset_index(name="count")
 
-# ✅ 색상 설정 (국가 히트: 민트 / 글로벌 히트: 핑크)
+# ✅ 색상 설정 (국가 히트: 연한 초록 / 글로벌 히트: 연한 핑크)
 color_map = {"National Hit": "#90EE90", "Global Hit": "lightpink"}
 
 # 🗺️ Folium 지도 생성
 m = folium.Map(location=[20, 0], zoom_start=2)
 
-# 지도에 원 추가 (국가별 작품 수 반영)
-for _, row in country_counts_df.iterrows():
+# 지도에 원 추가 (1위를 한 나라의 개수를 반영)
+for _, row in country_hit_counts.iterrows():
     country_info = country_coords[country_coords["country_iso2"] == row["country_iso2"]]
     if not country_info.empty:
         lat, lon = country_info.iloc[0]["latitude"], country_info.iloc[0]["longitude"]
-        radius = min(row["count"] * 5, 30)  # 작품 수에 비례, 최대 크기 제한
+
+        # ✅ 원 크기: 글로벌 히트일 경우 1위를 한 나라의 개수에 따라 크기 설정
+        if row["category"] == "Global Hit":
+            radius = np.log(row["count"] + 1) * 5  # 최소한의 차이를 유지하기 위해 로그 스케일 적용
+        else:
+            radius = 5  # National Hit은 일정한 크기 유지
+
+        # 📌 해당 국가에서 1위를 한 작품 리스트 가져오기 (최대 5개)
+        top_titles = week_df[week_df["country_iso2"] == row["country_iso2"]]["show_title"].unique()[:5]
+        top_titles_text = "<br>".join(top_titles) if len(top_titles) > 0 else "No data"
+
+        # 📌 팝업에 국가 코드 + 카테고리 + 작품 목록 표시
+        popup_text = (
+            f"{row['category']} ({selected_content})<br>"
+            f"국가 코드: {row['country_iso2']}<br>"
+            f"1위를 한 나라 수: {row['count']}<br>"
+            f"Top 작품:<br>{top_titles_text}"
+        )
 
         folium.CircleMarker(
             location=[lat, lon],
@@ -105,14 +134,14 @@ for _, row in country_counts_df.iterrows():
             fill=True,
             fill_color=color_map[row["category"]],
             fill_opacity=0.8,
-            popup=f"{row['category']}<br>국가 코드: {row['country_iso2']}<br>1위 작품 수: {row['count']}",
+            popup=popup_text,
         ).add_to(m)
 
-st.caption(f"주간별 1위 작품을 글로벌 히트 vs 국가 히트로 구분하여 시각화합니다. 현재 주간: **{selected_week}**")
+st.caption(f"주간별 1위 작품을 글로벌 히트 vs 국가 히트로 구분하여 시각화합니다. 현재 주간: **{selected_week}**, 콘텐츠 유형: **{selected_content}**")
 
 # 지도 렌더링
 st_folium(m, width=800, height=500)
 
 # 국가별 1위 작품 목록 표시
-st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
-st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
+st.write(f"### {selected_week} 주간 {selected_content} 국가별 1위 작품 목록")
+st.dataframe(week_df[["country_iso2", "show_title", "category"]].drop_duplicates())
