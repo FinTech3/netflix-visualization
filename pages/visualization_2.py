@@ -96,7 +96,7 @@ for _, row in country_counts_df.iterrows():
     country_info = country_coords[country_coords["country_iso2"] == row["country_iso2"]]
     if not country_info.empty:
         lat, lon = country_info.iloc[0]["latitude"], country_info.iloc[0]["longitude"]
-        radius = min(row["count"] * 3, 20)  # 작품 수에 비례, 최대 크기 제한
+        radius = min(row["count"] * 5, 30)  # 작품 수에 비례, 최대 크기 제한
 
         folium.CircleMarker(
             location=[lat, lon],
