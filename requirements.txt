@@ -5,3 +5,5 @@ folium
 streamlit-folium
 country-converter
 plotly
+requests
+branca

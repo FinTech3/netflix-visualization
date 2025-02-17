@@ -1,10 +1,13 @@
 import streamlit as st
 import pandas as pd
 import folium
+import requests
 import country_converter as coco  # 국가 이름을 코드로 변환
 from streamlit_folium import st_folium
 import os
 import numpy as np
+import json
+from branca.colormap import linear  # 색상 매핑을 위한 라이브러리
 
 # 📌 Streamlit UI
 st.title("Netflix 주간별 Top 1 Visualization")
@@ -18,7 +21,7 @@ def get_country_coords():
         "IL", "IT", "JM", "JP", "JO", "KE", "KW", "LV", "LB", "LT", "LU", "MY", "MV", "MT", "MQ", "MU", "MX", "MA",
         "NL", "NC", "NZ", "NI", "NG", "NO", "OM", "PK", "PA", "PY", "PE", "PH", "PL", "PT", "QA", "RO", "RE", "SA",
         "RS", "SG", "SK", "SI", "ZA", "KR", "ES", "LK", "SE", "CH", "TW", "TH", "TT", "TR", "UA", "AE", "GB", "US",
-        "UY", "VE", "VN"
+        "UY", "VE", "VN","RU"
     ]
 
     latitudes = [
@@ -29,7 +32,7 @@ def get_country_coords():
         3.2028, 35.8997, 14.6415, -20.3484, 23.6345, 31.7917, 52.3676, -20.9043, -40.9006, 12.8654, 9.0820, 60.4720,
         21.5126, 30.3753, 8.9824, -23.4425, -9.1900, 13.4125, 51.9194, 39.3999, 25.3548, 45.9432, -21.1151, 23.8859,
         44.0165, 1.3521, 48.6690, 46.1512, -30.5595, 37.5665, 40.4637, 7.8731, 60.1282, 46.8182, 23.6978, 15.8700,
-        10.6918, 38.9637, 48.3794, 25.2760, 55.3781, 37.0902, -32.5228, 6.4238, 14.0583
+        10.6918, 38.9637, 48.3794, 25.2760, 55.3781, 37.0902, -32.5228, 6.4238, 14.0583, 61.5240
     ]
 
     longitudes = [
@@ -41,11 +44,9 @@ def get_country_coords():
         165.6180, 172.6362, -85.2072, 8.6753, 8.4689, 55.9233, 69.3451, -79.5199, -58.4438, -75.0152, 121.7740,
         19.1451, -8.2245, 51.1839, 24.9668, 45.0792, 44.4249, 46.1512, 22.9375, 103.8198, 19.6990, 14.9955, 126.9780,
         -30.5595, 126.9780, -3.7038, 80.7718, 18.6435, 8.2275, 120.9605, 100.9925, 31.1656, 35.2433, 31.1656,
-        -95.7129, -3.4360, -95.7129, -55.7658
+        -95.7129, -3.4360, -95.7129, -55.7658, 105.3188
     ]
-
     return pd.DataFrame({"country_iso2": iso_codes, "latitude": latitudes, "longitude": longitudes})
-# 한국만 바꿈 126.9780
 
 # 데이터 로드 (캐싱)
 @st.cache_data
@@ -100,26 +101,51 @@ country_hit_counts = week_df.groupby(["country_iso2", "category"])["global_hit_c
 # ✅ 색상 설정 (국가 히트: 연한 초록 / 글로벌 히트: 연한 핑크)
 color_map = {"National Hit": "#90EE90", "Global Hit": "lightpink"}
 
+# 🏆 국가별 1위 작품 개수 데이터 준비
+country_hit_counts_map = week_df.groupby("country_iso2")["global_hit_count"].sum().reset_index()
+
+# 🌍 국가명을 Alpha-3 코드로 변환 (Folium Choropleth는 Alpha-3 코드 사용)
+country_hit_counts_map["country_alpha3"] = coco.convert(names=country_hit_counts_map["country_iso2"], to="ISO3")
+
+# 📌 Choropleth 색상 맵 설정 (1위를 많이 한 나라일수록 색이 짙어짐)
+colormap = linear.YlOrRd_09.scale(
+    country_hit_counts_map["global_hit_count"].min(),
+    country_hit_counts_map["global_hit_count"].max()
+)
+
+# 🌍 세계 지도 GeoJSON 데이터 로드
+world_geojson_url = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+world_geojson = json.loads(requests.get(world_geojson_url).text)
+
 # 🗺️ Folium 지도 생성
 m = folium.Map(location=[20, 0], zoom_start=2)
 
-# 지도에 원 추가 (1위를 한 나라의 개수를 반영)
+# 🌍 Choropleth 지도 추가 (국가별 1위 개수에 따라 색칠)
+folium.Choropleth(
+    geo_data=world_geojson,
+    name="Choropleth",
+    data=country_hit_counts_map,
+    columns=["country_alpha3", "global_hit_count"],
+    key_on="feature.id",
+    fill_color="YlOrRd",
+    fill_opacity=0.7,
+    line_opacity=0.5,
+    legend_name="국가별 Netflix 1위 작품 개수",
+    highlight=True,
+    nan_fill_color="#D3D3D3"
+).add_to(m)
+
+# 🗺️ 기존 원형 마커도 추가
 for _, row in country_hit_counts.iterrows():
     country_info = country_coords[country_coords["country_iso2"] == row["country_iso2"]]
     if not country_info.empty:
         lat, lon = country_info.iloc[0]["latitude"], country_info.iloc[0]["longitude"]
 
-        # ✅ 원 크기: 글로벌 히트일 경우 1위를 한 나라의 개수에 따라 크기 설정
-        if row["category"] == "Global Hit":
-            radius = np.log(row["count"] + 1) * 5  # 최소한의 차이를 유지하기 위해 로그 스케일 적용
-        else:
-            radius = 5  # National Hit은 일정한 크기 유지
+        radius = np.log(row["count"] + 1) * 5 if row["category"] == "Global Hit" else 5
 
-        # 📌 해당 국가에서 1위를 한 작품 리스트 가져오기 (최대 5개)
         top_titles = week_df[week_df["country_iso2"] == row["country_iso2"]]["show_title"].unique()[:5]
         top_titles_text = "<br>".join(top_titles) if len(top_titles) > 0 else "No data"
 
-        # 📌 팝업에 국가 코드 + 카테고리 + 작품 목록 표시
         popup_text = (
             f"{row['category']} ({selected_content})<br>"
             f"국가 코드: {row['country_iso2']}<br>"
@@ -137,11 +163,6 @@ for _, row in country_hit_counts.iterrows():
             popup=popup_text,
         ).add_to(m)
 
-st.caption(f"주간별 1위 작품을 글로벌 히트 vs 국가 히트로 구분하여 시각화합니다. 현재 주간: **{selected_week}**, 콘텐츠 유형: **{selected_content}**")
+colormap.add_to(m)
 
-# 지도 렌더링
 st_folium(m, width=800, height=500)
-
-# 국가별 1위 작품 목록 표시
-st.write(f"### {selected_week} 주간 {selected_content} 국가별 1위 작품 목록")
-st.dataframe(week_df[["country_iso2", "show_title", "category"]].drop_duplicates())
