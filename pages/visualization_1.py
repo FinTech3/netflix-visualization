@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -8,10 +9,11 @@ st.title("월간 넷플릭스 주가 & 월간 시청시간 1위 작품")
 
 @st.cache_data
 def load_monthly_data():
-    df = pd.read_csv("data/2-1_total.csv", parse_dates=['month_end', 'Date'])
-    df.sort_values('month_end', inplace=True)
-    return df
-
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+    return pd.read_csv(
+        os.path.join(base_path, "2-1_total.csv"),
+        parse_dates=['month_end', 'Date']
+    ).sort_values('month_end')
 df = load_monthly_data()
 
 fig = make_subplots(specs=[[{"secondary_y": True}]])
