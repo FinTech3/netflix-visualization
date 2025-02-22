@@ -216,7 +216,7 @@ else:
                 poster_path = movie_details.get('poster_path')
                 if poster_path:
                     poster_url = "https://image.tmdb.org/t/p/w500" + poster_path
-                    st.image(poster_url, caption=movie_title, use_column_width=True)
+                    st.image(poster_url, caption=movie_title, use_container_width=True)
                 else:
                     st.write(f"{movie_title}: 포스터를 찾을 수 없습니다.")
             
