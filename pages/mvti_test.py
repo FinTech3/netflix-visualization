@@ -141,12 +141,6 @@ else:
     # keyword_list = ", ".join(set(st.session_state.selected_keywords))
     # st.write(f"🎬 당신의 영화 추천 키워드: {keyword_list}")
 
-    # # 홈으로 돌아가기 버튼
-    # if st.button("🏠 다시 테스트하기"):
-    #     st.session_state.page = 1
-    #     st.session_state.answers = {}
-    #     st.session_state.selected_keywords = []
-    #     st.rerun()
     df = load_data()
 
     # st.write("📌 데이터프레임 컬럼 확인:", df.columns.tolist())
@@ -228,6 +222,11 @@ else:
         else:
             st.write(f"{movie_title}: 영화 정보를 찾을 수 없습니다.")
 
+    if st.button("🏠 다시 테스트하기"):
+        st.session_state.page = 1
+        st.session_state.answers = {}
+        st.session_state.selected_keywords = []
+        st.rerun()
 
 
 # 🏠 홈으로 가는 버튼 (중앙 정렬)
