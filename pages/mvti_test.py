@@ -1,11 +1,14 @@
+import requests
 import streamlit as st
-import pandas as pd 
+import pandas as pd
 import os
 
 st.set_page_config(page_title="MVTI 영화 성향 테스트", layout="wide")
 st.title("MVTI")
 st.write("내 성향으로 나만의 영화 추천받기")
 
+# API 키 설정
+api_key = '9ffc1ec82777dd0129dab4d5e890e96b'
 
 # 데이터 로드 (캐싱)
 @st.cache_data
@@ -121,56 +124,110 @@ if current_page <= len(questions):
 
 # 📌 결과 페이지
 else:
-    st.title("📊 결과 페이지")
-    st.write("✨ 당신의 영화 성향 테스트 결과 ✨")
-    st.write("당신이 선택한 답변")
+    # st.title("📊 결과 페이지")
+    # st.write("✨ 당신의 영화 성향 테스트 결과 ✨")
+    # st.write("당신이 선택한 답변")
 
-    for q_num, answer in st.session_state.answers.items():
-        st.markdown(f"**{q_num}**: {answer}")
+    # for q_num, answer in st.session_state.answers.items():
+    #     st.markdown(f"**{q_num}**: {answer}")
 
-    # 선택한 키워드 출력
-    st.markdown("""
-        <div class="question-box">
-            <h3>📌 추천 키워드</h3>
-        </div>
-    """, unsafe_allow_html=True)
+    # # 선택한 키워드 출력
+    # st.markdown("""
+    #     <div class="question-box">
+    #         <h3>📌 추천 키워드</h3>
+    #     </div>
+    # """, unsafe_allow_html=True)
     
-    keyword_list = ", ".join(set(st.session_state.selected_keywords))
-    st.write(f"🎬 당신의 영화 추천 키워드: {keyword_list}")
+    # keyword_list = ", ".join(set(st.session_state.selected_keywords))
+    # st.write(f"🎬 당신의 영화 추천 키워드: {keyword_list}")
 
-    # 홈으로 돌아가기 버튼
-    if st.button("🏠 다시 테스트하기"):
-        st.session_state.page = 1
-        st.session_state.answers = {}
-        st.session_state.selected_keywords = []
-        st.rerun()
+    # # 홈으로 돌아가기 버튼
+    # if st.button("🏠 다시 테스트하기"):
+    #     st.session_state.page = 1
+    #     st.session_state.answers = {}
+    #     st.session_state.selected_keywords = []
+    #     st.rerun()
+    df = load_data()
 
-
-df = load_data()
-
-st.write("📌 데이터프레임 컬럼 확인:", df.columns.tolist())
+    # st.write("📌 데이터프레임 컬럼 확인:", df.columns.tolist())
 
 
-# ✅ NaN 처리 (keywords가 없는 경우 빈 문자열로 대체)
-df["keywords"] = df["keywords"].fillna("")
+    # ✅ NaN 처리 (keywords가 없는 경우 빈 문자열로 대체)
+    df["keywords"] = df["keywords"].fillna("")
 
-# ✅ 키워드 매칭 개수 계산 함수
-def count_keyword_matches(row):
-    movie_tags = row["keywords"].split(", ")  # 태그를 리스트로 변환
-    return sum(tag in st.session_state.selected_keywords for tag in movie_tags)  # 키워드 매칭 개수 카운트
+    # ✅ 키워드 매칭 개수 계산 함수
+    def count_keyword_matches(row):
+        movie_tags = row["keywords"].split(", ")  # 태그를 리스트로 변환
+        return sum(tag in st.session_state.selected_keywords for tag in movie_tags)  # 키워드 매칭 개수 카운트
 
-# ✅ 각 영화에 대해 매칭된 키워드 개수를 추가
-df["match_count"] = df.apply(count_keyword_matches, axis=1)
+    # ✅ 각 영화에 대해 매칭된 키워드 개수를 추가
+    df["match_count"] = df.apply(count_keyword_matches, axis=1)
 
-# ✅ 매칭 개수가 많은 순으로 정렬 후 상위 5개 영화만 선택
-df_sorted = df.sort_values(by="match_count", ascending=False).head(5)
+    # ✅ 매칭 개수가 많은 순으로 정렬 후 상위 5개 영화만 선택
+    df_sorted = df.sort_values(by="match_count", ascending=False).head(5)
 
-# ✅ 결과 출력 (매칭 개수가 1개 이상인 영화만 표시)
-df_filtered = df_sorted[df_sorted["match_count"] > 0]
+    # ✅ 결과 출력 (매칭 개수가 1개 이상인 영화만 표시)
+    df_filtered = df_sorted[df_sorted["match_count"] > 0]
 
-# ✅ Streamlit에서 결과 출력
-st.title("🎬 Netflix 추천 영화 (TOP 5)")
-st.dataframe(df_sorted[["show_title", "weekly_rank", "weekly_views", "keywords", "match_count"]])
+    # ✅ Streamlit에서 결과 출력
+    st.title("🎬 Netflix 추천 영화 (TOP 5)")
+    #st.dataframe(df_sorted[["show_title","category", "weekly_rank", "weekly_views", "keywords", "match_count"]])
+
+
+    # ✅ 영화 상세 정보 및 포스터 가져오기
+    for index, row in df_sorted.iterrows():
+        movie_title = row["show_title"]
+        category = row["category"]
+    
+        # 카테고리에 따라 API URL 결정
+        if category.startswith("Films"):
+            search_url = "https://api.themoviedb.org/3/search/movie"
+        elif category.startswith("TV"):
+            search_url = "https://api.themoviedb.org/3/search/tv"
+        else:
+            st.write(f"Unknown category for {movie_title}: {category}")
+            continue
+
+        # 영화 검색
+        params = {
+            'api_key': api_key,
+            'query': movie_title,
+            'language': 'ko'
+        }
+        response = requests.get(search_url, params=params)
+        results = response.json().get('results', [])
+
+        if results:
+            movie_id = results[0]['id']
+            
+            # 영화 상세 정보 가져오기
+            details_url = f"https://api.themoviedb.org/3/{'movie' if 'movie' in search_url else 'tv'}/{movie_id}"
+            details_params = {
+                'api_key': api_key,
+                'language': 'ko-KR'
+            }
+            details_response = requests.get(details_url, params=details_params)
+            movie_details = details_response.json()
+            
+            # 영화 정보 표시 (한 줄 정렬)
+            col1, col2 = st.columns([1, 3.5])
+            with col1:
+                poster_path = movie_details.get('poster_path')
+                if poster_path:
+                    poster_url = "https://image.tmdb.org/t/p/w500" + poster_path
+                    st.image(poster_url, caption=movie_title, use_column_width=True)
+                else:
+                    st.write(f"{movie_title}: 포스터를 찾을 수 없습니다.")
+            
+            with col2:
+                st.subheader(movie_title)
+                st.write(f"**개봉일:** {movie_details.get('release_date', '정보 없음')}")
+                st.write(f"**평점:** {movie_details.get('vote_average', '정보 없음')}")
+                st.write(f"**줄거리:** {movie_details.get('overview', '줄거리 정보가 없습니다.')}")
+        else:
+            st.write(f"{movie_title}: 영화 정보를 찾을 수 없습니다.")
+
+
 
 # 🏠 홈으로 가는 버튼 (중앙 정렬)
 home_col = st.columns([3, 2, 3])
