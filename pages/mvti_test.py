@@ -4,8 +4,8 @@ import pandas as pd
 import os
 
 st.set_page_config(page_title="MVTI 영화 성향 테스트", layout="wide")
-st.title("MVTI")
-st.write("내 성향으로 나만의 영화 추천받기")
+st.header("MVTI 영화 성향 테스트")
+#st.write("내 성향으로 나만의 영화 추천받기")
 
 # API 키 설정
 api_key = '9ffc1ec82777dd0129dab4d5e890e96b'
@@ -36,14 +36,35 @@ st.markdown("""
     }
 
     .question-box {
-        background-color: rgba(138, 8, 41, 0.8);
-        padding: 20px;
-        border-radius: 15px;
-        color: white;
-        text-align: center;
+        background: #F5F5F5;  /* 박스 배경색 (연한 핑크) */
+        padding: 25px;  /* 박스 내부 여백 (패딩) */
+        border-radius: 15px;  /* 박스 모서리를 둥글게 (둥근 정도: 15px) */
+        color: white !important;  /* 텍스트 색상 (흰색) */
+        text-align: center ;  /* 텍스트 중앙 정렬 */
+        width: 70%;  /* 박스 너비를 화면의 80%로 설정 */
+        margin: 20px 0 20px 0;  /* 위/아래 마진 20px, 좌우 마진 없음 */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);  /* 박스 그림자 효과 */
+        font-size: 14px;  /* 글자 크기 (14px) */
+        font-weight: bold;  /* 글자 굵기 (굵게) */
+    }
+
+
+    .option-box{
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px auto;
         width: 80%;
-        margin: 20px auto;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        font-size: 16px;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+    .option-box:hover {
+        background-color: #f8e1e7;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -58,41 +79,37 @@ if "selected_keywords" not in st.session_state:
 
 # 📌 질문 리스트 (각 질문별 선택지와 키워드 매핑)
 questions = [
-    {
-        "question": "문득 하늘을 바라보았는데, 갑자기 어떤 감정이 차올랐어. 어떤 감정일까?",
-        "options": {
-            "A. 노을을 보고 센티멘털한 감성에 잠겼어": ["sentimental", "melancholy", "nostalgic","romance"],
-            "B. 왠지 희망적이고 행복한 감정이 들었어": ["hopeful", "happy", "uplifting"],
-            "C. 구름 낀 하늘처럼 갑갑하고 답답한 마음이 들었어": ["gloomy", "tense", "serious"],
-            "D. 특별한 감흥 없이 심심하고 무료하게 느껴졌어": ["neutral", "calm", "boring"]
-        }
+    { "question": "문득 하늘을 바라보았는데, 갑자기 어떤 감정이 차올랐어. 어떤 감정일까? ☁️",
+      "options": {
+          "노을을 보고 센티멘털한 감성에 잠겼어": ["sentimental", "melancholy", "nostalgic","romance"],
+          "왠지 희망적이고 행복한 감정이 들었어": ["hopeful", "happy", "uplifting"],
+          "구름 낀 하늘처럼 갑갑하고 답답한 마음이 들었어": ["gloomy", "tense", "serious"],
+          "특별한 감흥 없이 심심하고 무료하게 느껴졌어": ["neutral", "calm", "boring"]
+      }
     },
-    {
-        "question": "자, 이제 여행지를 골라보자. 어디로 가볼까?",
-        "options": {
-            "A. 아시아 지역 여행": ["Asia", "adventure", "culture"],
-            "B. 미국과 북미 여행": ["America", "modern", "urban"],
-            "C. 유럽 여행": ["Europe", "romantic", "history"],
-            "D. 동네 여행": ["local", "comfort", "slice of life"]
-        }
+    { "question": "자, 이제 여행지를 골라보자. 어디로 가볼까? ✈️",
+      "options": {
+          "아시아 지역 여행": ["Asia", "adventure", "culture"],
+          "미국과 북미 여행": ["America", "modern", "urban"],
+          "유럽 여행": ["Europe", "romantic", "history"],
+          "동네 여행": ["local", "comfort", "slice of life"]
+      }
     },
-    {
-        "question": "설레는 여행의 시작, 길을 걷다가 바스락 거리는 소리가 들려서 보았더니!",
-        "options": {
-            "A. 작은 강아지가 나를 빼꼼 보고 있네": ["dog", "animal", "pet"],
-            "B. 어린 아이가 무언가를 찾고 있었어": ["kid", "child", "innocence"],
-            "C. 배낭 멘 여행자가 물을 마시고 있었어": ["travel", "journey", "discovery"],
-            "D. 의심스러운 분위기의 첩보요원 같은 사람이 숨어 있었어": ["spy", "mystery", "action"]
-        }
+    { "question": "설레는 여행의 시작, 길을 걷다가 바스락 거리는 소리가 들려서 보았더니! 👀",
+      "options": {
+          "작은 강아지가 나를 빼꼼 보고 있네": ["dog", "animal", "pet"],
+          "어린 아이가 무언가를 찾고 있었어": ["kid", "child", "innocence"],
+          "배낭 멘 여행자가 물을 마시고 있었어": ["travel", "journey", "discovery"],
+          "의심스러운 분위기의 첩보요원 같은 사람이 숨어 있었어": ["spy", "mystery", "action"]
+      }
     },
-    {
-        "question": "큰 광장에 가보니 사람들이 잔뜩 모여 북적이고 있었는데…",
-        "options": {
-            "A. 교복을 입은 학생들이 한데 모여 놀고 있었어": ["students", "friendship", "school"],
-            "B. 서커스 단의 마술사가 선사하는 마술을 보는 사람들이 있었어": ["circus", "magic", "performance"],
-            "C. 경찰들이 주변을 통제하며 경계 태세를 갖추고 있었어": ["police", "crime", "thriller"],
-            "D. 시위대가 막 시위를 벌이고 구호를 외치고 있었어": ["protest", "revolution", "justice"]
-        }
+    { "question": "큰 광장에 가보니 사람들이 잔뜩 모여 북적이고 있었는데… 🧑‍🤝‍🧑",
+      "options": {
+          "교복을 입은 학생들이 한데 모여 놀고 있었어": ["students", "friendship", "school"],
+          "서커스 단의 마술사가 선사하는 마술을 보는 사람들이 있었어": ["circus", "magic", "performance"],
+          "경찰들이 주변을 통제하며 경계 태세를 갖추고 있었어": ["police", "crime", "thriller"],
+          "시위대가 막 시위를 벌이고 구호를 외치고 있었어": ["protest", "revolution", "justice"]
+      }
     }
 ]
 
@@ -103,15 +120,24 @@ if current_page <= len(questions):
 
     # 📌 질문과 선택지를 하나의 박스 안에 넣기 (HTML + CSS 적용)
     st.markdown(f"""
-        <div class="question-box">
-            <h3>Q{current_page}. {q_data['question']}</h3>
+        <div style="background: #F8E0E6; padding: 25px; border-radius: 15px; color: white;
+                    text-align: center; width: 80%; margin: 20px 0 20px 0; 
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); font-size: 14px; 
+                    font-weight: bold; display: flex; justify-content: flex-start;">
+            <h4>{q_data['question']}</h4>
         </div>
     """, unsafe_allow_html=True)
+
+
 
     # 📌 선택지 박스 (st.radio()를 같은 컨테이너 안에서 표시)
     with st.container():
         options = list(q_data["options"].keys())
-        selected_option = st.radio("선택하세요:", options, key=f"q{current_page}")
+        
+        selected_option = st.radio("", options, key=f"q{current_page}")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
     # 📌 다음 페이지 버튼
     if st.button("다음", key=f"next{current_page}"):
@@ -121,6 +147,22 @@ if current_page <= len(questions):
         st.session_state.selected_keywords.extend(selected_keywords)
         st.session_state.page += 1
         st.rerun()
+    
+    # # 📌 진행 상태 표시 (progress bar)
+    # progress_value = (current_page ) / (len(questions) )
+    # st.progress(progress_value, text=f"진행 상태: {current_page}/{len(questions)}")
+    # 📌 진행 상태 표시 (커스텀 진행 바)
+    progress_value = current_page / len(questions)
+
+    # 진행 바 스타일 적용 (HTML + CSS)
+    st.markdown(f"""
+        <div style="width: 100%; background-color: #E0E0E0; border-radius: 10px; height: 7px; position: relative; margin-top: 10px;">
+            <div style="width: {progress_value * 100}%; background-color: #8A0829; 
+                        height: 100%; border-radius: 10px;"></div>
+        </div>
+        <p style="text-align: center; font-weight: bold; margin-top: 5px;">진행 상태: {current_page}/{len(questions)}</p>
+    """, unsafe_allow_html=True)
+
 
 # 📌 결과 페이지
 else:
@@ -164,7 +206,7 @@ else:
     df_filtered = df_sorted[df_sorted["match_count"] > 0]
 
     # ✅ Streamlit에서 결과 출력
-    st.title("🎬 Netflix 추천 컨텐츠 (TOP 5)")
+    st.subheader("🎬 Netflix 추천 컨텐츠 (TOP 5)")
     #st.dataframe(df_sorted[["show_title","category", "weekly_rank", "weekly_views", "keywords", "match_count"]])
 
 
@@ -210,7 +252,7 @@ else:
                 poster_path = movie_details.get('poster_path')
                 if poster_path:
                     poster_url = "https://image.tmdb.org/t/p/w500" + poster_path
-                    st.image(poster_url, caption=movie_title, use_container_width=True)
+                    st.image(poster_url, caption=movie_title, use_container_width=True) # container 배포할땐 바꾸기
                 else:
                     st.write(f"{movie_title}: 포스터를 찾을 수 없습니다.")
             
@@ -222,7 +264,7 @@ else:
         else:
             st.write(f"{movie_title}: 영화 정보를 찾을 수 없습니다.")
 
-    if st.button("🏠 다시 테스트하기"):
+    if st.button("다시 테스트하기"):
         st.session_state.page = 1
         st.session_state.answers = {}
         st.session_state.selected_keywords = []
