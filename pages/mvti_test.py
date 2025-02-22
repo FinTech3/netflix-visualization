@@ -170,7 +170,7 @@ else:
     df_filtered = df_sorted[df_sorted["match_count"] > 0]
 
     # ✅ Streamlit에서 결과 출력
-    st.title("🎬 Netflix 추천 영화 (TOP 5)")
+    st.title("🎬 Netflix 추천 컨텐츠 (TOP 5)")
     #st.dataframe(df_sorted[["show_title","category", "weekly_rank", "weekly_views", "keywords", "match_count"]])
 
 
@@ -208,6 +208,7 @@ else:
             }
             details_response = requests.get(details_url, params=details_params)
             movie_details = details_response.json()
+            print(movie_details)
             
             # 영화 정보 표시 (한 줄 정렬)
             col1, col2 = st.columns([1, 3.5])
