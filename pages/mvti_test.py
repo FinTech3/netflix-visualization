@@ -120,7 +120,7 @@ if current_page <= len(questions):
 
     # 📌 질문과 선택지를 하나의 박스 안에 넣기 (HTML + CSS 적용)
     st.markdown(f"""
-        <div style="background: #F8E0E6; padding: 25px; border-radius: 15px; color: white;
+        <div style="background: #F8E0E6; padding: 25px; border-radius: 15px; color: #4A4A4A;
                     text-align: center; width: 80%; margin: 20px 0 20px 0; 
                     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); font-size: 14px; 
                     font-weight: bold; display: flex; justify-content: flex-start;">
