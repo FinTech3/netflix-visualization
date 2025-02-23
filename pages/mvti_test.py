@@ -252,15 +252,19 @@ else:
                 poster_path = movie_details.get('poster_path')
                 if poster_path:
                     poster_url = "https://image.tmdb.org/t/p/w500" + poster_path
-                    st.image(poster_url, caption=movie_title, use_container_width=True) # container 배포할땐 바꾸기
+                    st.image(poster_url, caption=movie_title, use_column_width=True) # container 배포할땐 바꾸기
                 else:
-                    st.write(f"{movie_title}: 포스터를 찾을 수 없습니다.")
+                    poster_url = "https://github.com/user-attachments/assets/4b8a1188-7d78-45f9-8cb1-27f94c21c215"
+                    st.image(poster_url, caption=movie_title, use_column_width=True)
+                    #st.write(f"{movie_title}: 포스터를 찾을 수 없습니다.")
             
             with col2:
                 st.subheader(movie_title)
                 st.write(f"**개봉일:** {movie_details.get('release_date', '정보 없음')}")
                 st.write(f"**평점:** {movie_details.get('vote_average', '정보 없음')}")
-                st.write(f"**줄거리:** {movie_details.get('overview', '줄거리 정보가 없습니다.')}")
+                overview = movie_details.get('overview', '').strip()
+                st.write(f"**줄거리:** {overview if overview else '줄거리 정보가 없습니다.'}")
+
         else:
             st.write(f"{movie_title}: 영화 정보를 찾을 수 없습니다.")
 
