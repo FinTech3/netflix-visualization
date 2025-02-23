@@ -6,7 +6,7 @@ from datetime import datetime
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-st.set_page_config(page_title="Monthly Netflix (Stock price with Hours Viewed)", layout="wide")
+st.set_page_config(page_title="Monthly Netflix (Stock Price and Hours Viewed)", layout="wide")
 
 col1, col2 = st.columns([0.3, 4.2])
 with col1:
@@ -27,7 +27,7 @@ st.markdown("""
   border-radius:90px;
   width:30%;
   margin:auto;">
-  <h3 style="color:white;width : 100%; text-align : center; padding : 0; ">Stock price with Hours viewed</h3>
+  <h3 style="color:white;width : 100%; text-align : center; padding : 0; ">Stock Price and Hours Viewed</h3>
 </div>
 """, unsafe_allow_html=True)
 
