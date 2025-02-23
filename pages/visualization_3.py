@@ -105,6 +105,12 @@ if __name__ == "__main__":
     main()
 
 
+
+
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
 # CSV 파일 로드
 netflix_df = pd.read_csv("data/Netflix_data.csv")
 amazon_df = pd.read_csv("data/Amazon_data.csv")
@@ -179,6 +185,11 @@ plt.tight_layout()
 st.pyplot(fig)
 
 
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn3
+
 # 데이터 로딩 함수
 @st.cache_data
 def load_data():
@@ -212,7 +223,7 @@ def get_top10_from_subset(df, subset):
     """각 구역의 작품에 대해 IMDb 평균 평점 기준으로 상위 10개 작품을 반환"""
     subset_df = df[df['title'].isin(subset)]  # 해당 구역에 속한 작품들만 추출
     subset_df_sorted = subset_df.sort_values('imdbAverageRating', ascending=False)  # IMDb 평균 평점 기준으로 내림차순 정렬
-    return subset_df_sorted[['title', 'imdbAverageRating']]  # 상위 10개 작품 반환
+    return subset_df_sorted[['title', 'imdbAverageRating']]  # 상위 작품 반환
 
 def main():
     st.title("🎬 OTT 플랫폼 교집합 분석")
@@ -252,27 +263,59 @@ def main():
     
     if len(selected_platforms) == 2:
         venn = venn2(platform_sets, selected_platforms, ax=ax)
+            # 텍스트 스타일 조정
+        for subset in venn.set_labels:
+            if subset:
+                subset.set_fontsize(14)
+                subset.set_fontweight("bold")
+                subset.set_color("white")
+
+        for subset in venn.subset_labels:
+            if subset:
+                subset.set_fontsize(16)
+                subset.set_fontweight("bold")
+                subset.set_color("white")
+
+        fig.patch.set_facecolor("#222222")  # 배경색
+        ax.set_facecolor("#222222")  # 그래프 내부 배경색
+        plt.title(" OTT Intersection ", fontsize=18, fontweight="bold", color="white")
+
+        st.pyplot(fig)
+        
     elif len(selected_platforms) == 3:
         venn = venn3(platform_sets, selected_platforms, ax=ax)
+            # 텍스트 스타일 조정
+        for subset in venn.set_labels:
+            if subset:
+                subset.set_fontsize(14)
+                subset.set_fontweight("bold")
+                subset.set_color("white")
 
-    # 텍스트 스타일 조정
-    for subset in venn.set_labels:
-        if subset:
-            subset.set_fontsize(14)
-            subset.set_fontweight("bold")
-            subset.set_color("white")
+        for subset in venn.subset_labels:
+            if subset:
+                subset.set_fontsize(16)
+                subset.set_fontweight("bold")
+                subset.set_color("white")
 
-    for subset in venn.subset_labels:
-        if subset:
-            subset.set_fontsize(16)
-            subset.set_fontweight("bold")
-            subset.set_color("white")
+        fig.patch.set_facecolor("#222222")  # 배경색
+        ax.set_facecolor("#222222")  # 그래프 내부 배경색
+        plt.title(" OTT Intersection ", fontsize=18, fontweight="bold", color="white")
 
-    fig.patch.set_facecolor("#222222")  # 배경색
-    ax.set_facecolor("#222222")  # 그래프 내부 배경색
-    plt.title(" OTT Intersection ", fontsize=18, fontweight="bold", color="white")
+        st.pyplot(fig)
+    elif len(selected_platforms) == 4:
+        intersection = common_titles
+        st.subheader("🏆집합별 IMDB TOP10")
+        selected_zone = st.radio("구역을 선택하세요", ["Intersection"])
 
-    st.pyplot(fig)
+        if selected_zone == "Intersection":
+            top10 = get_top10_from_subset(pd.concat([platform_dict[selected_platforms[0]], platform_dict[selected_platforms[1]],platform_dict[selected_platforms[2]],platform_dict[selected_platforms[3]]]), intersection)
+        # 중복을 제거한 후, IMDb 평균 평점 기준으로 내림차순 정렬
+        top10_unique = top10.drop_duplicates(subset="title").sort_values('imdbAverageRating', ascending=False)
+        # 10개 작품만 선택
+        top10 = top10_unique.head(10)
+        st.write(top10)
+    
+    
 
     # 구역 선택 인터페이스
     if len(selected_platforms) == 2:
@@ -290,7 +333,7 @@ def main():
         elif selected_zone == f"Only {selected_platforms[1]}":
             top10 = get_top10_from_subset(platform_dict[selected_platforms[1]], only_platform_2)
         else:
-            top10 = get_top10_from_subset(platform_dict[selected_platforms[0]], intersection)
+            top10 = get_top10_from_subset(pd.concat([platform_dict[selected_platforms[0]], platform_dict[selected_platforms[1]]]), intersection)
         # 중복을 제거한 후, IMDb 평균 평점 기준으로 내림차순 정렬
         top10_unique = top10.drop_duplicates(subset="title").sort_values('imdbAverageRating', ascending=False)
         # 10개 작품만 선택
@@ -339,6 +382,7 @@ def main():
         # 10개 작품만 선택
         top10 = top10_unique.head(10)
         st.write(top10)
+    
 
 if __name__ == "__main__":
     main()
