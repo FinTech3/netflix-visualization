@@ -121,7 +121,7 @@ world_geojson = json.loads(requests.get(world_geojson_url).text)
 m = folium.Map(location=[20, 0], zoom_start=2)
 
 # 🌍 Choropleth 지도 추가 (국가별 1위 개수에 따라 색칠)
-folium.Choropleth(
+choropleth = folium.Choropleth(
     geo_data=world_geojson,
     name="Choropleth",
     data=country_hit_counts_map,
@@ -130,42 +130,117 @@ folium.Choropleth(
     fill_color="YlOrRd",
     fill_opacity=0.7,
     line_opacity=0.5,
-    legend_name="국가별 Netflix 1위 작품 개수",
     highlight=True,
-    nan_fill_color="#D3D3D3"
+    nan_fill_color="transparent"
 ).add_to(m)
 
-# 🗺️ 기존 원형 마커도 추가
-for _, row in country_hit_counts.iterrows():
-    country_info = country_coords[country_coords["country_iso2"] == row["country_iso2"]]
-    if not country_info.empty:
-        lat, lon = country_info.iloc[0]["latitude"], country_info.iloc[0]["longitude"]
+# ✅ Folium의 자동 범례를 비활성화 (HTML 요소를 직접 제거)
+for key in list(choropleth._children):
+    if key.startswith("color_map"):
+        del choropleth._children[key]
 
-        radius = np.log(row["count"] + 1) * 5 if row["category"] == "Global Hit" else 5
-
-        top_titles = week_df[week_df["country_iso2"] == row["country_iso2"]]["show_title"].unique()[:5]
-        top_titles_text = "<br>".join(top_titles) if len(top_titles) > 0 else "No data"
-
-        popup_text = (
-            f"{row['category']} ({selected_content})<br>"
-            f"국가 코드: {row['country_iso2']}<br>"
-            f"1위를 한 나라 수: {row['count']}<br>"
-            f"Top 작품:<br>{top_titles_text}"
-        )
-
-        folium.CircleMarker(
-            location=[lat, lon],
-            radius=radius,
-            color=color_map[row["category"]],
-            fill=True,
-            fill_color=color_map[row["category"]],
-            fill_opacity=0.8,
-            popup=popup_text,
-        ).add_to(m)
-
+# ✅ 수동으로 컬러맵 범례 추가 (위치를 bottomleft로 조정)
+colormap.caption = "국가별 Netflix 1위 작품 개수"
 colormap.add_to(m)
 
+# ✅ CSS를 이용해 컬러맵 위치를 미세 조정
+from branca.element import Template, MacroElement
+
+legend_css = """
+<style>
+    .leaflet-control-colorlegend {
+        position: absolute !important;
+        bottom: 30px !important;
+        left: 10px !important;  /* 왼쪽으로 더 이동 */
+        width: 250px !important;
+    }
+</style>
+"""
+
+legend_style = MacroElement()
+legend_style._template = Template(legend_css)
+m.get_root().add_child(legend_style)
+
+
+# 🏆 국가별 1위 작품 및 1위 국가 개수를 담은 데이터 딕셔너리 생성
+country_info_dict = week_df.groupby("country_iso2").agg({
+    "show_title": lambda x: ", ".join(set(x)),  # 중복 제거 후 문자열로 변환
+    "global_hit_count": "first"
+}).to_dict(orient="index")
+
+# 🌍 국가별 Tooltip 및 팝업 표시 함수
+def get_tooltip(feature):
+    country_name = feature["properties"].get("name", "Unknown")
+    country_alpha2 = coco.convert(names=country_name, to="ISO2", not_found=None)
+
+    if country_alpha2 and country_alpha2 in country_info_dict:
+        title_list = country_info_dict[country_alpha2]["show_title"]
+        global_hit_count = country_info_dict[country_alpha2]["global_hit_count"]
+
+        return f"<b>Top 1 작품:</b> {title_list}<br><b>1위를 한 나라 수:</b> {global_hit_count}"
+    else:
+        return "<b>데이터 없음</b>"
+
+# 🌍 국가별 Tooltip 및 팝업 표시 함수
+def get_tooltip(feature):
+    country_name = feature["properties"].get("name", "Unknown")
+    country_alpha2 = coco.convert(names=country_name, to="ISO2", not_found=None)
+
+    if country_alpha2 and country_alpha2 in country_info_dict:
+        title_list = country_info_dict[country_alpha2]["show_title"]
+        global_hit_count = country_info_dict[country_alpha2]["global_hit_count"]
+
+        return f"<b>국가:</b> {country_name}<br><b>Top 1 작품:</b> {title_list}<br><b>1위를 한 나라 수:</b> {global_hit_count}"
+    else:
+        return f"<b>국가:</b> {country_name}<br><b>데이터 없음</b>"
+
+# 🌍 국가별 GeoJSON Layer 추가 (Tooltip + Hover Effect)
+geojson_layer = folium.GeoJson(
+    world_geojson,
+    name="Country Borders",
+    style_function=lambda x: {
+        "fillOpacity": 0,  # Choropleth 색상을 유지하면서 경계만 강조
+        "color": "black",
+        "weight": 1  # 기본 테두리 두께
+    },
+    highlight_function=lambda x: {
+        "weight": 3,  # 마우스를 올릴 때 테두리를 더 두껍게
+        "color": "#FF5733",  # 강조된 테두리 색 (오렌지)
+        "fillOpacity": 0.4  # 약간의 투명도 추가
+    },
+    tooltip=folium.GeoJsonTooltip(
+        fields=["name"],  # 국가 이름 표시
+        aliases=["Country:"],
+        labels=True,
+        localize=True,
+        sticky=False
+    )
+).add_to(m)
+
+# 🌍 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
+for feature in world_geojson["features"]:
+    country_name = feature["properties"].get("name", "Unknown")
+    popup_text = get_tooltip(feature)
+
+    folium.GeoJson(
+        feature,
+        tooltip=popup_text,  # 마우스를 올릴 때 팝업으로 표시
+        style_function=lambda x: {
+            "fillOpacity": 0,  # 기존 Choropleth 색상을 유지하기 위해 투명 처리
+            "color": "black",
+            "weight": 1
+        },
+        highlight_function=lambda x: {
+            "weight": 3,  # 마우스를 올릴 때 강조 효과 추가
+            "color": "#848484",  # 강조된 테두리 색 (오렌지)
+            "fillOpacity": 0.4
+        }
+    ).add_to(m)
+
+
+# 🌍 지도 표시
 st_folium(m, width=800, height=500)
+
 
 # 국가별 1위 작품 목록 표시
 # st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
@@ -191,32 +266,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 홈 버튼 스타일 적용
-st.markdown(
-    """
-    <style>
-    .home-button-container button {
-        background-color: #8A0829 !important;
-        color: white !important;
-        font-size: 16px;
-        padding: 8px 14px;
-        border-radius: 6px;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .home-button-container button:hover {
-        background-color: #6A061F !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# 중앙 정렬된 홈 버튼
-home_col = st.columns([3, 2, 3])
+# 🏠 홈으로 가는 버튼
+home_col = st.columns([3, 2, 3])  # 중앙 정렬
 with home_col[1]:
-    # 버튼을 특정 div로 감싸서 스타일 적용
-    st.markdown('<div class="home-button-container">', unsafe_allow_html=True)
     if st.button("🏠 Home", key="home"):
-        st.switch_page("app.py")
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.switch_page("app.py")  # 홈으로 이동
