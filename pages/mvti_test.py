@@ -5,7 +5,6 @@ import os
 
 st.set_page_config(page_title="MVTI 영화 성향 테스트", layout="wide")
 st.header("MVTI 영화 성향 테스트")
-#st.write("내 성향으로 나만의 영화 추천받기")
 
 # API 키 설정
 api_key = '9ffc1ec82777dd0129dab4d5e890e96b'

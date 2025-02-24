@@ -168,8 +168,8 @@ colormap.add_to(m)
 st_folium(m, width=800, height=500)
 
 # 국가별 1위 작품 목록 표시
-st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
-st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
+# st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
+# st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
 
 st.markdown("""
     <style>
