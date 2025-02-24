@@ -298,7 +298,7 @@ else:
                     st.image(poster_url, caption=movie_title, use_container_width=True) # container 배포할땐 바꾸기
                 else:
                     poster_url = "https://github.com/user-attachments/assets/4b8a1188-7d78-45f9-8cb1-27f94c21c215"
-                    st.image(poster_url, caption=movie_title, use_column_width=True)
+                    st.image(poster_url, caption=movie_title, use_container_width=True)
             
             with col2:
                 st.subheader(movie_title)
