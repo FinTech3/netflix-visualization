@@ -274,5 +274,3 @@ home_col = st.columns([3, 2, 3])
 with home_col[1]:
     if st.button("🏠 Home", key="home"):
         st.switch_page("app.py")  # 홈으로 이동
-
-st.cache_data.clear() 
