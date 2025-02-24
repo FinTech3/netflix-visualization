@@ -84,7 +84,8 @@ questions = [
         "왠지 희망적이고 행복한 감정이 들었어": ["hopeful", "happy", "uplifting", "cheerful", "excited", "exhilarated", "hilarious", "lighthearted", "amused", "joyous", "enthusiastic"],
         "구름 낀 하늘처럼 갑갑하고 답답한 마음이 들었어": ["gloomy", "tense", "serious", "anxious", "intense", "aggressive", "angry", "cynical", "frantic", "paranoia", "foreboding", "loss of loved one", "trauma", "ptsd", "loneliness", "distressing", "sad"],
         "특별한 감흥 없이 심심하고 무료하게 느껴졌어": ["neutral", "calm", "boring"]
-      }
+      },
+      "note": "그래서… 여행을 떠나기로 했어!"
     },
     {
       "question": "설레는 여행의 시작, 큰 광장에 가보니 사람들이 잔뜩 모여 북적이고 있었는데…",
@@ -93,7 +94,8 @@ questions = [
         "교복을 입은 학생들이 수학여행을 와서 서로 꺄르르 웃으며 대화하고 있었어": ["highschool", "teenmovie", "teenagegirl", "teenageboy", "teenager", "comingofage", "teacher", "school", "bullying", "teencomedy", "teendrama", "romcom", "friendship", "bestfriend", "highschoolstudent", "boardingschool", "prom"],
         "어린 아이들이 밝은 햇살이 비추는 분수에서 즐겁게 놀고 있었어": ["baby", "kids", "child", "parent child relationship", "mother", "father", "mother daughter relationship", "father son relationship", "playful", "orphan", "childprodigy", "parenting"],
         "경찰과 범죄자로 보이는 사람이 서로 대치하고 있었어": ["police", "detective", "cop", "buddycop", "fbi", "cia", "spy", "espionage", "secretagent", "hitman", "assassin", "corruption", "gangster", "organizedcrime", "robbery", "violence", "gun", "shootout", "streetgang", "policechase", "policebrutality", "policecorruption", "undercover", "undercovercop", "conman"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "비를 피하고 있는데, 여행 중 우연히 만난 여행자가 이야기를 시작했어. ☔",
@@ -102,7 +104,8 @@ questions = [
         "납치당할 뻔했던 위험천만한 경험담": ["kidnapping", "hostage", "survival", "suspenseful", "psychologicalthriller", "ontherun", "rescuemission", "prisonescape", "terroristattack", "childkidnapping", "doublecross", "struggleforsurvival"],
         "웃음이 터지는 코믹한 경험담": ["comedy", "standupcomedy", "buddycomedy", "hilarious", "slapstickcomedy", "absurd", "parody", "spoof", "satire", "romcom", "amused", "ridiculous", "actioncomedy"],
         "역사적 유적지에서 겪은 의미 있는 경험담": ["perioddrama", "biography", "basedontruestory", "documentary", "worldwarii", "19thcentury", "1970s", "1940s", "1960s", "victorianengland", "15thcentury", "middleages4761453", "archaeologist", "nazi", "tomb", "historical", "scotland", "basedonmemoirorautobiography"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "여행자가 갑자기 나와 내기를 하고 싶다고 해! 🎲",
@@ -111,7 +114,8 @@ questions = [
         "몸을 제대로 쓰는 운동 경기로 자웅을 겨뤄보자!": ["sports", "sports documentary", "football", "soccer", "basketball", "martialarts", "boxing", "golf", "competition", "rivalry", "sport competition"],
         "역시 내기에는 게임이지. 게임 내기를 해보자!": ["basedonvideogame", "videogame", "game"],
         "역시 이럴 때는 술내기로 제대로 이겨줘야지!": ["alcoholic", "alcoholism", "drunkenness", "drugdealer", "drugs"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "그런데 갑자기 “꺄악!” 하는 비명 소리가 들리더니… 😱",
@@ -120,7 +124,8 @@ questions = [
         "갑자기 어디선가 좀비들이 나타나 거리 한복판을 헤집고 다니기 시작했어!": ["zombie", "zombieapocalypse", "apocalypse", "postapocalyptic future", "survival", "survivalhorror", "gore", "virus", "struggle for survival", "savingtheworld"],
         "거대한 허리케인이 저 멀리서 빠르게 다가오고 있었어!": ["disaster", "disastermovie", "hurricane", "flood", "tsunami", "storm", "earthquake", "survival", "struggle for urvival"],
         "어? 분명 들렸는데…? 그러나 아무도 없었고, 비명은 환청처럼 사라졌어!": ["ghost", "supernatural", "exorcism", "demon", "psychologicalthriller", "haunting", "hauntedhouse", "possession", "occult", "witch", "wizard", "foundfootage", "devil", "spirit", "cult", "halloween"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "오늘 하루 스쳐간 사건들 속에서, 문득 소중한 누군가가 떠올랐어. 💭",
@@ -129,7 +134,8 @@ questions = [
         "나를 언제나 믿어주는 가족.": ["family", "familyrelationships", "father daughter relationship", "father sonr elationship", "mother aughter relationship", "mother son elationship", "sibling relationship", "brother brother relationship", "brother sisterr elationship", "parent child relationship", "single mother", "family secrets", "motherhood", "family comedy", "family vacation"],
         "내가 가장 사랑하는 내 연인.": ["love", "romance", "romantic", "fallinginlove", "marriage", "wedding", "extramarital affair", "adultery", "infidelity", "lovetriangle", "loveaffair", "gaytheme", "lgbt", "forbiddenlove", "older woman younger man relationship", "older woman seduces younger guy"],
         "누구보다 소중한 바로 나 자신.": [""]
-      }
+      },
+      "note": ""
     },
     {
       "question": "여행을 떠난 지도 꽤 시간이 흘렀고, 딱 좋아하는 계절이 찾아왔어. 🌸🍂",
@@ -138,7 +144,8 @@ questions = [
         "하얀 눈과 쌀쌀한 날씨의 겨울.": ["winter", "christmas", "snow", "alaska"],
         "따뜻한 기운이 도는 새싹이 반가운 봄.": [""],
         "선선한 바람이 불어오는 낙엽의 가을.": [""]
-      }
+      },
+      "note": ""
     },
     {
       "question": "여행지의 노천 극장에서 상영 중인 영화 한 편이 눈길을 끄네? 🎬",
@@ -147,7 +154,8 @@ questions = [
         "상상력 풍부한 애니메이션, 게임 원작의 작품.": ["anime", "basedonmanga", "basedoncomic", "basedongraphicnovel", "basedonvideogame", "videogame", "cartoon", "3danimation", "animation", "anthropomorphism", "live actionand animation", "adultanimation", "shounen", "kaiju"],
         "잘 알려진 소설 원작의 작품.": ["based on novelor book", "based onc hildrens book", "based on young adult novel", "based on short", "adaptation", "perioddrama", "historicaldrama"],
         "연극이나 뮤지컬 원작의 작품.": ["based on playor musical", "burlesque", "jukeboxmusical", "live action remake"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "여행 마지막날 밤 꿈을 꾸었는데, 흥미로운 꿈을 꾸었어. 🌙",
@@ -156,7 +164,8 @@ questions = [
         "지구와 우주를 오가며 펼쳐지는 박진감 넘치는 우주 활극.": ["space", "spacetravel", "spacecraft", "alien", "alieninvasion", "alienspaceship", "portal", "adventure", "outerspace", "parallelworld"],
         "내가 슈퍼히어로로 변신해서 도시를 구하는 이야기.": ["superhero", "superpower", "superheroteam", "vigilante", "secretidentity", "supervillain", "femalehero", "marvelcinematicuniversemcu", "savingtheworld", "action", "goodversusevil"],
         "전설과 신화 속 용사와 거대한 용이 싸우는 모험.": ["dragon", "fairytale", "wizard", "witch", "king", "princess", "prince", "kingdom", "magic", "swordandsorcery", "supernatural creature", "mythic", "fantasyworld"]
-      }
+      },
+      "note": ""
     },
     {
       "question": "여행을 마치려고 보니, 뭔가 아쉬워. 다음엔 어디를 가보면 좋을까?",
@@ -165,7 +174,8 @@ questions = [
         "미국과 북미 여행.": ["usa", "newyorkcity", "losangeles", "california", "texas", "florida", "illinois", "louisiana", "georgia", "chicago", "newjersey", "neworleans", "atlanta", "seattle", "washington", "michigan"],
         "유럽 여행.": ["england", "france", "italy", "spain", "germany", "sweden", "norway", "scotland", "europe", "london", "paris", "victorianengland", "berlin", "rome"],
         "어디든 좋아! 즐거울 수 있는 곳이라면!": [""]
-      }
+      },
+      "note": "이제 여행을 마치고 집으로 돌아와서, 편안한 마음으로 넷플릭스를 열었더니…!"
     }
 ]
 
@@ -191,6 +201,8 @@ if current_page <= len(questions):
         options = list(q_data["options"].keys())
         
         selected_option = st.radio("", options, key=f"q{current_page}")
+
+        st.markdown("#### " + q_data["note"])
 
         st.markdown("</div>", unsafe_allow_html=True)
 
