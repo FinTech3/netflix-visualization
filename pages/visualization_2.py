@@ -241,11 +241,6 @@ for feature in world_geojson["features"]:
 # 🌍 지도 표시
 st_folium(m, width=800, height=500)
 
-
-# 국가별 1위 작품 목록 표시
-# st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
-# st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
-
 st.markdown("""
     <style>
     .stButton>button {
@@ -267,7 +262,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 🏠 홈으로 가는 버튼
-home_col = st.columns([3, 2, 3])  # 중앙 정렬
+home_col = st.columns([3, 2, 3]) 
 with home_col[1]:
     if st.button("🏠 Home", key="home"):
         st.switch_page("app.py")  # 홈으로 이동
