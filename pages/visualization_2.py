@@ -168,18 +168,6 @@ country_info_dict = week_df.groupby("country_iso2").agg({
     "global_hit_count": "first"
 }).to_dict(orient="index")
 
-# 🌍 국가별 Tooltip 및 팝업 표시 함수
-def get_tooltip(feature):
-    country_name = feature["properties"].get("name", "Unknown")
-    country_alpha2 = coco.convert(names=country_name, to="ISO2", not_found=None)
-
-    if country_alpha2 and country_alpha2 in country_info_dict:
-        title_list = country_info_dict[country_alpha2]["show_title"]
-        global_hit_count = country_info_dict[country_alpha2]["global_hit_count"]
-
-        return f"<b>Top 1 작품:</b> {title_list}<br><b>1위를 한 나라 수:</b> {global_hit_count}"
-    else:
-        return "<b>데이터 없음</b>"
 
 # 🌍 국가별 Tooltip 및 팝업 표시 함수
 def get_tooltip(feature):
