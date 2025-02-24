@@ -8,6 +8,7 @@ import os
 import numpy as np
 import json
 from branca.colormap import linear  # 색상 매핑을 위한 라이브러리
+import re
 
 # 📌 Streamlit UI
 st.title("Netflix 주간별 Top 1 Visualization")
@@ -170,6 +171,8 @@ legend_style = MacroElement()
 legend_style._template = Template(legend_css)
 m.get_root().add_child(legend_style)
 
+######################여기부터 속도가 느려짐.
+
 
 # 🏆 국가별 1위 작품 및 1위 국가 개수를 담은 데이터 딕셔너리 생성
 country_info_dict = week_df.groupby("country_iso2").agg({
@@ -191,22 +194,27 @@ def get_tooltip(feature):
     else:
         return f"<b>국가:</b> {country_name}<br><b>데이터 없음</b>"
 
-# 🌍 국가별 GeoJSON Layer 추가 (Tooltip + Hover Effect)
+# 🌍 팝업 데이터 사전 생성
+popup_data = {
+    feature["properties"].get("name", "Unknown"): get_tooltip(feature)
+    for feature in world_geojson["features"]
+}
+
 geojson_layer = folium.GeoJson(
     world_geojson,
     name="Country Borders",
     style_function=lambda x: {
-        "fillOpacity": 0,  # Choropleth 색상을 유지하면서 경계만 강조
+        "fillOpacity": 0,
         "color": "black",
-        "weight": 1  # 기본 테두리 두께
+        "weight": 1
     },
     highlight_function=lambda x: {
-        "weight": 3,  # 마우스를 올릴 때 테두리를 더 두껍게
-        "color": "#FF5733",  # 강조된 테두리 색 (오렌지)
-        "fillOpacity": 0.4  # 약간의 투명도 추가
+        "weight": 3,
+        "color": "#FF5733",
+        "fillOpacity": 0.4
     },
     tooltip=folium.GeoJsonTooltip(
-        fields=["name"],  # 국가 이름 표시
+        fields=["name"],  # ✅ 마우스를 올리면 국가 이름만 표시
         aliases=["Country:"],
         labels=True,
         localize=True,
@@ -214,7 +222,7 @@ geojson_layer = folium.GeoJson(
     )
 ).add_to(m)
 
-# 🌍 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
+#🌍 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
 for feature in world_geojson["features"]:
     country_name = feature["properties"].get("name", "Unknown")
     popup_text = get_tooltip(feature)
@@ -233,7 +241,6 @@ for feature in world_geojson["features"]:
             "fillOpacity": 0.4
         }
     ).add_to(m)
-
 
 # 🌍 지도 표시
 st_folium(m, width=800, height=500)
@@ -264,3 +271,4 @@ with home_col[1]:
     if st.button("🏠 Home", key="home"):
         st.switch_page("app.py")  # 홈으로 이동
 
+st.cache_data.clear() 
