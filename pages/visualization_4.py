@@ -151,3 +151,10 @@ def show_filtered_movies():
 
 if __name__ == "__main__":
     main()
+
+
+# 🏠 홈으로 가는 버튼
+home_col = st.columns([3, 2, 3])  # 중앙 정렬
+with home_col[1]:
+    if st.button("🏠 Home", key="home"):
+        st.switch_page("app.py")  # 홈으로 이동
