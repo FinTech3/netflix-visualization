@@ -245,9 +245,23 @@ geojson_layer = folium.GeoJson(
 # 🌍 지도 표시
 st_folium(m, width=800, height=500)
 
-# 국가별 1위 작품 목록 표시
+# # 📌 테이블 UI 출력
+# st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
+
 st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
-st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
+
+# ✅ 원본 데이터프레임을 사용해야 iterrows() 가능
+for _, row in week_df[["country_name", "show_title", "category"]].drop_duplicates().iterrows():
+    col1, col2, col3 = st.columns([2, 3, 2])
+    with col1:
+        st.markdown(f"**🌍 국가:** {row['country_name']}")
+    with col2:
+        st.markdown(f"🎬 **Top 1 작품:** `{row['show_title']}`")
+    with col3:
+        st.markdown(f"📌 **카테고리:** `{row['category']}`")
+
+    st.markdown("---")  # 구분선 추가
+
 
 st.markdown("""
     <style>
