@@ -210,7 +210,7 @@ geojson_layer = folium.GeoJson(
     },
     highlight_function=lambda x: {
         "weight": 3,
-        "color": "#FF5733",
+        "color": "#848484",
         "fillOpacity": 0.4
     },
     tooltip=folium.GeoJsonTooltip(
@@ -223,27 +223,31 @@ geojson_layer = folium.GeoJson(
 ).add_to(m)
 
 #🌍 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
-for feature in world_geojson["features"]:
-    country_name = feature["properties"].get("name", "Unknown")
-    popup_text = get_tooltip(feature)
+# for feature in world_geojson["features"]:
+#     country_name = feature["properties"].get("name", "Unknown")
+#     popup_text = get_tooltip(feature)
 
-    folium.GeoJson(
-        feature,
-        tooltip=popup_text,  # 마우스를 올릴 때 팝업으로 표시
-        style_function=lambda x: {
-            "fillOpacity": 0,  # 기존 Choropleth 색상을 유지하기 위해 투명 처리
-            "color": "black",
-            "weight": 1
-        },
-        highlight_function=lambda x: {
-            "weight": 3,  # 마우스를 올릴 때 강조 효과 추가
-            "color": "#848484",  # 강조된 테두리 색 (오렌지)
-            "fillOpacity": 0.4
-        }
-    ).add_to(m)
+#     folium.GeoJson(
+#         feature,
+#         tooltip=popup_text,  # 마우스를 올릴 때 팝업으로 표시
+#         style_function=lambda x: {
+#             "fillOpacity": 0,  # 기존 Choropleth 색상을 유지하기 위해 투명 처리
+#             "color": "black",
+#             "weight": 1
+#         },
+#         highlight_function=lambda x: {
+#             "weight": 3,  # 마우스를 올릴 때 강조 효과 추가
+#             "color": "#848484",  # 강조된 테두리 색 (오렌지)
+#             "fillOpacity": 0.4
+#         }
+#     ).add_to(m)
 
 # 🌍 지도 표시
 st_folium(m, width=800, height=500)
+
+# 국가별 1위 작품 목록 표시
+st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
+st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
 
 st.markdown("""
     <style>
