@@ -254,3 +254,8 @@ home_col = st.columns([3, 2, 3])
 with home_col[1]:
     if st.button("🏠 Home", key="home"):
         st.switch_page("app.py")  # 홈으로 이동
+
+if st.button("🔄 캐시 초기화"):
+    st.cache_data.clear()
+    st.success("캐시가 초기화되었습니다! 새 데이터를 다시 로드합니다.")
+
