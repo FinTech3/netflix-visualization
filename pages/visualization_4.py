@@ -149,12 +149,41 @@ def show_filtered_movies():
         </style>
     """, unsafe_allow_html=True)
 
+    home_col = st.columns([3, 2, 3])
+    with home_col[1]:
+        st.markdown(
+            """
+            <style>
+            .home-button-container button {
+                background-color: white !important;
+                color: #8A0829 !important;
+                font-size: 16px;
+                padding: 8px 14px;
+                border-radius: 6px;
+                border: none;
+                transition: all 0.3s ease;
+            }
+            .home-button-container button:hover {
+                background-color: #E0E0E0 !important;
+            }
+            .home-button-container button:focus {
+                color: #8A0829 !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            </style>
+            <div class="home-button-container">
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("🏠 Home", key="home"):
+            st.switch_page("app.py")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
 if __name__ == "__main__":
     main()
 
 
-# 🏠 홈으로 가는 버튼
-home_col = st.columns([3, 2, 3])  # 중앙 정렬
-with home_col[1]:
-    if st.button("🏠 Home", key="home"):
-        st.switch_page("app.py")  # 홈으로 이동

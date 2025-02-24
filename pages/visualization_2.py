@@ -191,8 +191,32 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🏠 홈으로 가는 버튼
-home_col = st.columns([3, 2, 3])  # 중앙 정렬
+# 홈 버튼 스타일 적용
+st.markdown(
+    """
+    <style>
+    .home-button-container button {
+        background-color: #8A0829 !important;
+        color: white !important;
+        font-size: 16px;
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .home-button-container button:hover {
+        background-color: #6A061F !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# 중앙 정렬된 홈 버튼
+home_col = st.columns([3, 2, 3])
 with home_col[1]:
+    # 버튼을 특정 div로 감싸서 스타일 적용
+    st.markdown('<div class="home-button-container">', unsafe_allow_html=True)
     if st.button("🏠 Home", key="home"):
-        st.switch_page("app.py")  # 홈으로 이동
+        st.switch_page("app.py")
+    st.markdown('</div>', unsafe_allow_html=True)
