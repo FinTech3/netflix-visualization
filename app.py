@@ -76,8 +76,8 @@ st.markdown('<p class="title">Netflix Is All You Need</p>', unsafe_allow_html=Tr
 with st.container():
     st.markdown("""
         <div class="container">
-            <h2>Discover Your Travel Personality</h2>
-            <p>Take our MVTI test and uncover your ideal travel experiences.</p>
+            <h2>Discover Your Streaming Personality</h2>
+            <p>Take our MVTI test and find your perfect Netflix match!</p>
         </div>
     """, unsafe_allow_html=True)
 
