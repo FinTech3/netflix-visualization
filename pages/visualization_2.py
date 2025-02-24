@@ -113,9 +113,18 @@ colormap = linear.YlOrRd_09.scale(
     country_hit_counts_map["global_hit_count"].max()
 )
 
-# 🌍 세계 지도 GeoJSON 데이터 로드
-world_geojson_url = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
-world_geojson = json.loads(requests.get(world_geojson_url).text)
+
+@st.cache_data
+def load_geojson():
+    # 현재 실행 중인 파일의 디렉토리를 기준으로 data 폴더 찾기
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    geojson_path = os.path.join(base_dir, "..", "data", "countries.json")  # ".."을 추가하여 상위 디렉토리 접근
+
+    # 파일 로드
+    with open(geojson_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+world_geojson = load_geojson()
 
 # 🗺️ Folium 지도 생성
 m = folium.Map(location=[20, 0], zoom_start=2)
@@ -254,8 +263,4 @@ home_col = st.columns([3, 2, 3])
 with home_col[1]:
     if st.button("🏠 Home", key="home"):
         st.switch_page("app.py")  # 홈으로 이동
-
-if st.button("🔄 캐시 초기화"):
-    st.cache_data.clear()
-    st.success("캐시가 초기화되었습니다! 새 데이터를 다시 로드합니다.")
 
