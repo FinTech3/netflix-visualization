@@ -25,7 +25,7 @@ def map_category(cat):
 
 def main():
     st.set_page_config(layout="wide")
-    st.title("🏆 수상 데이터 분석")
+    st.title("🏆 넷플릭스에서 볼 수 있는 수상작 네트워크")
 
     df = pd.read_csv("data/2-5.csv")
 
