@@ -92,7 +92,6 @@ def main():
     nodes_data = []
     for person, info in person_info.items():
         deg = degree_dict.get(person, 0)
-        # 노드 크기 무제한 (상한 없음)
         size_val = 20 + deg * 3
 
         shape_type = "circularImage" if info["image"] else "dot"
@@ -128,7 +127,6 @@ def main():
     for (p1, p2), weight in edge_dict.items():
         d1 = degree_dict.get(p1, 1)
         d2 = degree_dict.get(p2, 1)
-        # ★ 기존 (1 + 0.3*(d1+d2))에서 2배로
         w = 2.5 * (1 + 0.3 * (d1 + d2))  
         edges_data.append({
             "id": f"edge_{edge_id}",
@@ -201,22 +199,20 @@ def create_visjs_html(nodes, edges, person_movies_map):
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <style>
-    /* 전체 페이지 배경을 연한 베이지(#f5f5dc)로 */
     html, body {
       margin: 0; 
       padding: 0;
       height: 100%;
       font-family: 'Roboto', sans-serif;
-      background-color: #f5f5dc; /* 연한 베이지색 */
+      background-color: #f5f5dc; 
     }
     #mynetwork {
       width: 100%;
       height: 100%;
-      /* 이쁜 테두리와 배경 */
-      background: #f5f5dc; /* 베이지색 배경 */
-      border: 2px solid #e0c9a6; /* 좀 더 어울리는 테두리색 */
-      border-radius: 10px; /* 둥근 모서리 */
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 은은한 그림자 */
+      background: #f5f5dc; 
+      border: 2px solid #e0c9a6; 
+      border-radius: 10px; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       position: relative;
     }
     #popup {
