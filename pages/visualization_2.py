@@ -10,10 +10,8 @@ import json
 from branca.colormap import linear  # 색상 매핑을 위한 라이브러리
 import re
 
-# 📌 Streamlit UI
 st.title("Netflix 주간별 Top 1 Visualization")
 
-# 🌍 국가별 위도/경도 데이터 (ISO 코드 기반) - 캐싱
 @st.cache_data
 def get_country_coords():
     iso_codes = [
@@ -58,7 +56,7 @@ def load_data():
         pd.read_csv(os.path.join(base_path, "2-2_tv.csv")),
     )
 
-# 🏆 1위 작품만 필터링
+# 1위 작품만 필터링
 movies_df, series_df = load_data()
 movies_df["content_type"] = "Movie"  # 영화
 series_df["content_type"] = "TV"  # TV
@@ -68,47 +66,47 @@ top1_df = pd.concat([movies_df[movies_df["weekly_rank"] == 1], series_df[series_
 country_coords = get_country_coords()
 top1_df = top1_df.merge(country_coords, on="country_iso2", how="left")
 
-# 📅 주간 목록
+# 주간 목록
 weeks = sorted(top1_df["week"].unique(), reverse=True)
 
-# 📌 주간 선택
+# 주간 선택
 selected_week = st.selectbox("주간을 선택하세요:", weeks)
 
-# 📌 콘텐츠 유형 선택 (영화/TV)
+# 콘텐츠 유형 선택 (영화/TV)
 content_options = ["Movie", "TV"]
 selected_content = st.radio("콘텐츠 유형을 선택하세요:", content_options, horizontal=True)
 
-# 🏆 주간별 데이터 필터링 (캐싱)
+# 주간별 데이터 필터링 (캐싱)
 @st.cache_data
 def filter_week_data(week, content_type):
     week_df = top1_df[(top1_df["week"] == week) & (top1_df["content_type"] == content_type)].copy()
     
-    # ✅ 각 작품이 몇 개의 서로 다른 국가에서 1위를 했는지 계산
+    # 각 작품이 몇 개의 서로 다른 국가에서 1위를 했는지 계산
     weekly_counts = week_df.groupby("show_title")["country_iso2"].nunique()
     
-    # ✅ 글로벌 히트 수정: 2개 이상의 서로 다른 국가에서 1위를 해야 글로벌 히트
+    # 글로벌 히트 수정: 2개 이상의 서로 다른 국가에서 1위를 해야 글로벌 히트
     week_df["category"] = week_df["show_title"].map(lambda x: "Global Hit" if weekly_counts[x] >= 2 else "National Hit")
     
-    # ✅ 글로벌 히트 작품의 국가 개수를 저장 (각 작품이 몇 개 나라에서 1위를 했는지)
+    # 글로벌 히트 작품의 국가 개수를 저장 (각 작품이 몇 개 나라에서 1위를 했는지)
     week_df["global_hit_count"] = week_df["show_title"].map(lambda x: weekly_counts[x] if weekly_counts[x] >= 2 else 1)
     
     return week_df
 
 week_df = filter_week_data(selected_week, selected_content)
 
-# 🌍 국가별 1위를 한 작품의 국가 수 계산
+# 국가별 1위를 한 작품의 국가 수 계산
 country_hit_counts = week_df.groupby(["country_iso2", "category"])["global_hit_count"].sum().reset_index(name="count")
 
-# ✅ 색상 설정 (국가 히트: 연한 초록 / 글로벌 히트: 연한 핑크)
+# 색상 설정 (국가 히트: 연한 초록 / 글로벌 히트: 연한 핑크)
 color_map = {"National Hit": "#90EE90", "Global Hit": "lightpink"}
 
-# 🏆 국가별 1위 작품 개수 데이터 준비
+# 국가별 1위 작품 개수 데이터 준비
 country_hit_counts_map = week_df.groupby("country_iso2")["global_hit_count"].sum().reset_index()
 
-# 🌍 국가명을 Alpha-3 코드로 변환 (Folium Choropleth는 Alpha-3 코드 사용)
+# 국가명을 Alpha-3 코드로 변환 (Folium Choropleth는 Alpha-3 코드 사용)
 country_hit_counts_map["country_alpha3"] = coco.convert(names=country_hit_counts_map["country_iso2"], to="ISO3")
 
-# 📌 Choropleth 색상 맵 설정 (1위를 많이 한 나라일수록 색이 짙어짐)
+# Choropleth 색상 맵 설정 (1위를 많이 한 나라일수록 색이 짙어짐)
 colormap = linear.YlOrRd_09.scale(
     country_hit_counts_map["global_hit_count"].min(),
     country_hit_counts_map["global_hit_count"].max()
@@ -127,10 +125,10 @@ def load_geojson():
 
 world_geojson = load_geojson()
 
-# 🗺️ Folium 지도 생성
+# Folium 지도 생성
 m = folium.Map(location=[20, 0], zoom_start=2)
 
-# 🌍 Choropleth 지도 추가 (국가별 1위 개수에 따라 색칠)
+# Choropleth 지도 추가 (국가별 1위 개수에 따라 색칠)
 choropleth = folium.Choropleth(
     geo_data=world_geojson,
     name="Choropleth",
@@ -144,16 +142,16 @@ choropleth = folium.Choropleth(
     nan_fill_color="transparent"
 ).add_to(m)
 
-# ✅ Folium의 자동 범례를 비활성화 (HTML 요소를 직접 제거)
+# Folium의 자동 범례를 비활성화 (HTML 요소를 직접 제거)
 for key in list(choropleth._children):
     if key.startswith("color_map"):
         del choropleth._children[key]
 
-# ✅ 수동으로 컬러맵 범례 추가 (위치를 bottomleft로 조정)
+# 수동으로 컬러맵 범례 추가 (위치를 bottomleft로 조정)
 colormap.caption = "국가별 Netflix 1위 작품 개수"
 colormap.add_to(m)
 
-# ✅ CSS를 이용해 컬러맵 위치를 미세 조정
+# CSS를 이용해 컬러맵 위치를 미세 조정
 from branca.element import Template, MacroElement
 
 legend_css = """
@@ -171,17 +169,14 @@ legend_style = MacroElement()
 legend_style._template = Template(legend_css)
 m.get_root().add_child(legend_style)
 
-######################여기부터 속도가 느려짐.
-
-
-# 🏆 국가별 1위 작품 및 1위 국가 개수를 담은 데이터 딕셔너리 생성
+# 국가별 1위 작품 및 1위 국가 개수를 담은 데이터 딕셔너리 생성
 country_info_dict = week_df.groupby("country_iso2").agg({
     "show_title": lambda x: ", ".join(set(x)),  # 중복 제거 후 문자열로 변환
     "global_hit_count": "first"
 }).to_dict(orient="index")
 
 
-# 🌍 국가별 Tooltip 및 팝업 표시 함수
+# 국가별 Tooltip 및 팝업 표시 함수
 def get_tooltip(feature):
     country_name = feature["properties"].get("name", "Unknown")
     country_alpha2 = coco.convert(names=country_name, to="ISO2", not_found=None)
@@ -194,7 +189,7 @@ def get_tooltip(feature):
     else:
         return f"<b>국가:</b> {country_name}<br><b>데이터 없음</b>"
 
-# 🌍 팝업 데이터 사전 생성
+# 팝업 데이터 사전 생성
 popup_data = {
     feature["properties"].get("name", "Unknown"): get_tooltip(feature)
     for feature in world_geojson["features"]
@@ -214,7 +209,7 @@ geojson_layer = folium.GeoJson(
         "fillOpacity": 0.4
     },
     tooltip=folium.GeoJsonTooltip(
-        fields=["name"],  # ✅ 마우스를 올리면 국가 이름만 표시
+        fields=["name"], 
         aliases=["Country:"],
         labels=True,
         localize=True,
@@ -222,7 +217,7 @@ geojson_layer = folium.GeoJson(
     )
 ).add_to(m)
 
-#🌍 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
+# 국가별 팝업 추가 (1위를 한 작품과 1위 국가 개수 표시)
 # for feature in world_geojson["features"]:
 #     country_name = feature["properties"].get("name", "Unknown")
 #     popup_text = get_tooltip(feature)
@@ -242,15 +237,11 @@ geojson_layer = folium.GeoJson(
 #         }
 #     ).add_to(m)
 
-# 🌍 지도 표시
 st_folium(m, width=800, height=500)
 
-# # 📌 테이블 UI 출력
-# st.dataframe(week_df[["country_name", "show_title", "category"]].drop_duplicates())
 
 st.write(f"### {selected_week} 주간 국가별 1위 작품 목록")
 
-# ✅ 원본 데이터프레임을 사용해야 iterrows() 가능
 for _, row in week_df[["country_name", "show_title", "category"]].drop_duplicates().iterrows():
     col1, col2, col3 = st.columns([2, 3, 2])
     with col1:
